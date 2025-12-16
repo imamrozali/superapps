@@ -121,6 +121,13 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
+    console.log('Login successful for user:', userData.user.id);
+    console.log('Session cookie set:', {
+      hasSession: !!sessionPayload,
+      expiresAt: expiresAt.toISOString(),
+      isProduction: process.env.NODE_ENV === 'production'
+    });
+
     return response;
   } catch (error) {
     console.error('Login error:', error);
