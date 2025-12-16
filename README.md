@@ -151,18 +151,54 @@ superapps/
 
 ### Deploy to Vercel
 
+**Production URL:** https://superapps-kappa.vercel.app
+
 See [VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md) for detailed deployment instructions.
 
-Quick deploy:
-```bash
-# Install Vercel CLI
-npm i -g vercel
+#### Quick Setup
 
-# Deploy
+1. **Set environment variables in Vercel Dashboard:**
+
+Go to: https://vercel.com/pokemon-catch-muhammadimamrozali/superapps/settings/environment-variables
+
+Required variables:
+- `DATABASE_URL` - Already set from Neon ✅
+- `JWT_SECRET` - Generate: `openssl rand -base64 32`
+- `ENCRYPTION_KEY` - Generate: `openssl rand -base64 32`
+- `NEXTAUTH_URL` - `https://superapps-kappa.vercel.app`
+- `RP_ID` - `superapps-kappa.vercel.app`
+- `EXPECTED_ORIGIN` - `https://superapps-kappa.vercel.app`
+- `NODE_ENV` - `production`
+
+2. **Run database migrations:**
+```bash
+# Set DATABASE_URL to production database
+export DATABASE_URL="postgresql://neondb_owner:..."
+
+# Run migrations
+npm run db:migrate
+
+# Seed initial data (optional)
+npm run db:seed
+```
+
+3. **Redeploy:**
+```bash
 vercel --prod
 ```
 
-**Important:** Make sure to set all environment variables in Vercel dashboard before deploying.
+Or use the automated script:
+```bash
+./scripts/setup-vercel-env.sh
+```
+
+#### OAuth Setup (Optional)
+
+**GitHub OAuth:**
+- Callback URL: `https://superapps-kappa.vercel.app/api/v1/auth/github/callback`
+
+**Google OAuth:**
+- Callback URL: `https://superapps-kappa.vercel.app/api/v1/auth/google/callback`
 
 ## Troubleshooting
 
