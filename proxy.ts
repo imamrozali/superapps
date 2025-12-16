@@ -7,29 +7,36 @@ const protectedRoutes = ['/dashboard'];
 const publicRoutes = ['/login', '/signup', '/'];
 
 export default async function middleware(req: NextRequest) {
-  // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
+  
+  // Skip middleware for API routes, static files, and Next.js internals
+  if (
+    path.startsWith('/api') ||
+    path.startsWith('/_next') ||
+    path.startsWith('/favicon.ico') ||
+    path.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
   const isProtectedRoute = protectedRoutes.some(route => 
     path.startsWith(route)
   );
   const isPublicRoute = publicRoutes.includes(path);
-  // 3. Decrypt the session from the cookie
+  
+  // Decrypt the session from the cookie
   const cookie = req.cookies.get('session')?.value;
   const session = await decrypt(cookie);
 
   logger.dev({ path, isProtectedRoute, isPublicRoute, hasSession: !!session });
 
-  // 4. Redirect to /login if the user is not authenticated
+  // Redirect to /login if the user is not authenticated on protected route
   if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
   }
 
-  // 5. Redirect to /dashboard if the user is authenticated
-  if (
-    isPublicRoute &&
-    session?.userId &&
-    !req.nextUrl.pathname.startsWith('/dashboard')
-  ) {
+  // Redirect to /dashboard if the user is authenticated and trying to access login page
+  if (path === '/login' && session?.userId) {
     return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
   }
 
@@ -38,5 +45,15 @@ export default async function middleware(req: NextRequest) {
 
 // Routes Middleware should not run on
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - api routes
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (images, etc)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
