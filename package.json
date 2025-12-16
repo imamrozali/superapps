@@ -41,5 +41,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0",
+    "@esbuild-kit/core-utils": "npm:tsx@^4.21.0"
   }
 }

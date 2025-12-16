@@ -9,7 +9,7 @@ import { revokeAllUserSessions, getUserActiveSessions } from '@/lib/auth/session
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getSession();
@@ -23,7 +23,7 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const userId = params.userId;
+    const { userId } = await params;
     const activeSessions = await getUserActiveSessions(userId);
 
     return NextResponse.json({
@@ -39,7 +39,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getSession();
@@ -54,7 +54,7 @@ export async function POST(
     }
 
     const { reason } = await request.json();
-    const userId = params.userId;
+    const { userId } = await params;
 
     await revokeAllUserSessions(
       userId,

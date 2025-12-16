@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Verification failed' }, { status: 400 });
     }
 
-    const { credential, credentialDeviceType, credentialBackedUp } = verification.registrationInfo!;
+    const { credential } = verification.registrationInfo!;
 
     // Store the passkey
     await db.insert(passkeys).values({

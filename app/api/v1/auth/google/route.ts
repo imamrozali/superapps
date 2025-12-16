@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 const oauth2Client = new google.auth.OAuth2(
@@ -7,7 +7,7 @@ const oauth2Client = new google.auth.OAuth2(
   `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/v1/auth/google/callback`
 );
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const scopes = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',

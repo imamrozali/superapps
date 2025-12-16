@@ -8,7 +8,6 @@ import { eq } from 'drizzle-orm';
 function decryptSecret(encrypted: string): string {
   // In real app, proper decryption, but for demo, this is not secure
   // For production, use proper encryption
-  const key = process.env.ENCRYPTION_KEY || 'default-key-change-in-prod';
   // This is not real decryption, just placeholder
   return encrypted; // TODO: implement proper decrypt
 }

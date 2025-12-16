@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { generateRegistrationOptions } from '@simplewebauthn/server';
 import { getSession } from '@/lib/auth/session';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const session = await getSession();
   
   if (!session?.userId) {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const userId = session.userId;
 
   // In a real app, get existing passkeys for this user
-  const existingPasskeys: any[] = []; // TODO: fetch from DB
+  const existingPasskeys: Array<{ credentialId: string }> = []; // TODO: fetch from DB
 
   const options = await generateRegistrationOptions({
     rpName: 'SuperApps',

@@ -26,7 +26,7 @@ export default function LoginPage() {
       } else {
         alert('Login failed');
       }
-    } catch (error) {
+    } catch {
       alert('Error occurred');
     } finally {
       setLoading(false);

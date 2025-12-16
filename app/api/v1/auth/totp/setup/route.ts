@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { authenticator } from 'otplib';
 import { getSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
@@ -13,7 +13,7 @@ function encryptSecret(secret: string): string {
   return hmac.digest('hex');
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const session = await getSession();
   
   if (!session?.userId) {

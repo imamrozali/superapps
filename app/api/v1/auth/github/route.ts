@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID!;
 const BASE_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';

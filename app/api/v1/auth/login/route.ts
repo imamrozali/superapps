@@ -4,7 +4,7 @@ import { createSessionWithRefresh } from '@/lib/auth/session-manager';
 import { encrypt } from '@/lib/auth/session';
 import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { organizationMemberships, roles, roleAssignments, permissions, rolePermissions } from '@/lib/db/schema';
+import { organizationMemberships, roleAssignments, permissions, rolePermissions } from '@/lib/db/schema';
 
 export async function POST(request: NextRequest) {
   try {

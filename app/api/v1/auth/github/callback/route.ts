@@ -56,14 +56,14 @@ export async function GET(request: NextRequest) {
     });
 
     const emails = await emailsResponse.json();
-    const primaryEmail = emails.find((e: any) => e.primary)?.email || githubUser.email;
+    const primaryEmail = emails.find((e: { primary: boolean; email: string }) => e.primary)?.email || githubUser.email;
 
     if (!primaryEmail || !githubUser.id) {
       return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
     }
 
     // Check if OAuth account exists
-    let oauthAccount = await db
+    const oauthAccount = await db
       .select()
       .from(oauthAccounts)
       .where(eq(oauthAccounts.providerId, githubUser.id.toString()))

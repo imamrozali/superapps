@@ -11,35 +11,35 @@ class Logger {
     this.isDevelopment = process.env.NODE_ENV === 'development';
   }
 
-  debug(message: string, ...args: any[]) {
+  debug(message: string, ...args: unknown[]) {
     if (this.isDevelopment) {
       console.log(`[DEBUG] ${message}`, ...args);
     }
   }
 
-  info(message: string, ...args: any[]) {
+  info(message: string, ...args: unknown[]) {
     if (this.isDevelopment) {
       console.info(`[INFO] ${message}`, ...args);
     }
   }
 
-  warn(message: string, ...args: any[]) {
+  warn(message: string, ...args: unknown[]) {
     console.warn(`[WARN] ${message}`, ...args);
   }
 
-  error(message: string, ...args: any[]) {
+  error(message: string, ...args: unknown[]) {
     console.error(`[ERROR] ${message}`, ...args);
   }
 
   // Log only in development
-  dev(...args: any[]) {
+  dev(...args: unknown[]) {
     if (this.isDevelopment) {
       console.log(...args);
     }
   }
 
   // Always log (for production-critical logs)
-  prod(...args: any[]) {
+  prod(...args: unknown[]) {
     console.log(...args);
   }
 }

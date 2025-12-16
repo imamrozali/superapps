@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { getUserActiveSessions, revokeSession } from '@/lib/auth/session-manager';
 
@@ -7,7 +7,7 @@ import { getUserActiveSessions, revokeSession } from '@/lib/auth/session-manager
  * DELETE - Revoke a specific session
  */
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if OAuth account exists
-    let oauthAccount = await db
+    const oauthAccount = await db
       .select()
       .from(oauthAccounts)
       .where(eq(oauthAccounts.providerId, googleUser.id))

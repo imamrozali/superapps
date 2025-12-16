@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { deleteSession } from '@/lib/auth/session';
-import { cookies } from 'next/headers';
 
 export async function POST() {
   // Delete session from database
@@ -10,7 +9,6 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
   
   // Clear all auth-related cookies
-  const cookieStore = await cookies();
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
