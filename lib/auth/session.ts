@@ -10,7 +10,16 @@ export interface SessionPayload {
   expiresAt: Date;
 }
 
-const SECRET_KEY = process.env.JWT_SECRET
+const SECRET_KEY = process.env.JWT_SECRET;
+
+if (!SECRET_KEY) {
+  throw new Error(
+    'JWT_SECRET environment variable is not set. ' +
+    'Please add it to your environment variables. ' +
+    'Generate one with: openssl rand -base64 32'
+  );
+}
+
 const encodedKey = new TextEncoder().encode(SECRET_KEY);
 
 export async function encrypt(payload: SessionPayload) {
