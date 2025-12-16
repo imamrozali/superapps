@@ -12,22 +12,31 @@ export interface SessionPayload {
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
-if (!SECRET_KEY) {
-  throw new Error(
-    'JWT_SECRET environment variable is not set. ' +
-    'Please add it to your environment variables. ' +
-    'Generate one with: openssl rand -base64 32'
-  );
-}
+// Lazy initialization for edge runtime compatibility
+let encodedKey: Uint8Array | null = null;
 
-const encodedKey = new TextEncoder().encode(SECRET_KEY);
+function getEncodedKey(): Uint8Array {
+  if (!SECRET_KEY) {
+    throw new Error(
+      'JWT_SECRET environment variable is not set. ' +
+      'Please add it to your environment variables. ' +
+      'Generate one with: openssl rand -base64 32'
+    );
+  }
+  
+  if (!encodedKey) {
+    encodedKey = new TextEncoder().encode(SECRET_KEY);
+  }
+  
+  return encodedKey;
+}
 
 export async function encrypt(payload: SessionPayload) {
   return new SignJWT({ ...payload, expiresAt: payload.expiresAt.toISOString() })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('24h')
-    .sign(encodedKey);
+    .sign(getEncodedKey());
 }
 
 export async function decrypt(session: string | undefined = '') {
@@ -37,7 +46,7 @@ export async function decrypt(session: string | undefined = '') {
       return null;
     }
     
-    const { payload } = await jwtVerify(session, encodedKey, {
+    const { payload } = await jwtVerify(session, getEncodedKey(), {
       algorithms: ['HS256'],
     });
     return payload as unknown as SessionPayload;
