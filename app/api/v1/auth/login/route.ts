@@ -6,6 +6,10 @@ import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { organizationMemberships, roleAssignments, permissions, rolePermissions } from '@/lib/db/schema';
 
+// Force Node.js runtime for cookie handling
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -95,30 +99,32 @@ export async function POST(request: NextRequest) {
         id: userData.user.id,
         email: email,
       }
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      }
     });
 
-    response.cookies.set('session', sessionPayload, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: expiresAt,
+      sameSite: 'lax' as const,
       path: '/',
+    };
+
+    response.cookies.set('session', sessionPayload, {
+      ...cookieOptions,
+      expires: expiresAt,
     });
 
     response.cookies.set('session_token', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       expires: expiresAt,
-      path: '/',
     });
 
     response.cookies.set('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      path: '/',
     });
 
     console.log('Login successful for user:', userData.user.id);
