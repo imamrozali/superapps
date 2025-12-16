@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { decrypt } from '@/lib/auth/session';
-import { logger } from '@/lib/logger';
 
-// 1. Specify protected and public routes
+// Specify protected and public routes
 const protectedRoutes = ['/dashboard'];
-const publicRoutes = ['/login', '/signup', '/'];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
+  // Skip middleware for RSC requests - let React handle them
   if (req.nextUrl.searchParams.has('_rsc')) {
     return NextResponse.next();
   }
 
-
-  // Skip middleware for API routes, static files, and Next.js internals
+  // Skip middleware for API routes and static files
   if (
     path.startsWith('/api') ||
     path.startsWith('/_next') ||
@@ -24,40 +22,27 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const isProtectedRoute = protectedRoutes.some(route =>
-    path.startsWith(route)
-  );
-
-  // Decrypt the session from the cookie
-  const cookie = req.cookies.get('session')?.value;
-  let session = null;
-
-  if (cookie) {
-    try {
-      session = await decrypt(cookie);
-    } catch (error) {
-      logger.dev('Session decrypt error:', error);
-      const response = NextResponse.redirect(new URL('/login', req.nextUrl));
-      response.cookies.delete('session');
-      return response;
+  // Only handle login redirect when authenticated
+  if (path === '/login') {
+    const cookie = req.cookies.get('session')?.value;
+    if (cookie) {
+      try {
+        const session = await decrypt(cookie);
+        if (session?.userId) {
+          console.log('[Middleware] Redirecting authenticated user from login to dashboard');
+          return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+        }
+      } catch (error) {
+        console.error('[Middleware] Session decrypt error on login page:', error);
+        // Clear invalid session
+        const response = NextResponse.next();
+        response.cookies.delete('session');
+        return response;
+      }
     }
   }
 
-
-  logger.dev({ path, isProtectedRoute, hasSession: !!session, userId: session?.userId });
-
-  // Redirect to /login if the user is not authenticated on protected route
-  if (isProtectedRoute && !session?.userId) {
-    logger.dev('Redirecting to login - no session');
-    return NextResponse.redirect(new URL('/login', req.nextUrl));
-  }
-
-  // Redirect to /dashboard if the user is authenticated and trying to access login page
-  if (path === '/login' && session?.userId) {
-    logger.dev('Redirecting to dashboard - already authenticated');
-    return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
-  }
-
+  // Let dashboard/layout.tsx handle protected route authentication
   return NextResponse.next();
 }
 
